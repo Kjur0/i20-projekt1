@@ -9,29 +9,35 @@ import java.util.NoSuchElementException;
 /**
  * Graf nieskierowany z wagami
  * <p>
- *     Klasa reprezentująca graf nieskierowany z wagami. Zawiera wsparcie dla <a href="https://mermaid-js.github.io/mermaid/#/">Mermaid</a>.
+ * Klasa reprezentująca graf nieskierowany z wagami.<br>
+ * Zawiera wsparcie dla <a href="https://mermaid-js.github.io/mermaid/#/">Mermaid</a>.
  * </p>
+ *
  * @author Krzysztof Jurkowski
- * @version 1.0
+ * @version 1.1
+ * @since zad1
  */
 public class Graph {
 	/**
 	 * Wierzchołki grafu
+	 *
 	 * @since 1.0
 	 */
-	private final Vertices VERTICES;
+	protected final Vertices VERTICES;
 	/**
 	 * Krawędzie grafu
+	 *
 	 * @since 1.0
 	 */
-	private final Edges EDGES;
+	protected final Edges EDGES;
 
 	/**
 	 * Konstruktor klasy Graph
 	 * <p>
-	 *     Tworzy nowy graf nieskierowany z wagami.
-	 *     Inicjalizuje wewnętrzne struktury danych.
+	 * Tworzy nowy graf nieskierowany z wagami.<br>
+	 * Inicjalizuje wewnętrzne struktury danych.
 	 * </p>
+	 *
 	 * @since 1.0
 	 */
 	public Graph() {
@@ -40,10 +46,26 @@ public class Graph {
 	}
 
 	/**
+	 * Konstruktor klasy Graph
+	 * <p>
+	 * Tworzy nowy graf nieskierowany z wagami na podstawie innego grafu.<br>
+	 * Kopiuje wierzchołki i krawędzie z podanego grafu.
+	 * </p>
+	 *
+	 * @param graph Graf do skopiowania
+	 * @since 1.1
+	 */
+	public Graph(@NotNull Graph graph) {
+		VERTICES = graph.VERTICES;
+		EDGES = graph.EDGES;
+	}
+
+	/**
 	 * Konwertuje graf na Mermaid
 	 * <p>
-	 *     Wykonuje konwersję grafu na format Mermaid.
+	 * Wykonuje konwersję grafu na format Mermaid.
 	 * </p>
+	 *
 	 * @return Graf w formacie Mermaid
 	 * @see Vertices#mermaid()
 	 * @see Edges#mermaid()
@@ -55,6 +77,7 @@ public class Graph {
 
 	/**
 	 * Dodaje wierzchołek do grafu.
+	 *
 	 * @param name Nazwa wierzchołka
 	 * @return Identyfikator wierzchołka
 	 * @see Vertices#create(String)
@@ -66,6 +89,7 @@ public class Graph {
 
 	/**
 	 * Dodaje nienazwany wierzchołek do grafu.
+	 *
 	 * @return Identyfikator wierzchołka
 	 * @see Vertices#create()
 	 * @since 1.0
@@ -76,6 +100,7 @@ public class Graph {
 
 	/**
 	 * Dodaje wierzchołki do grafu.
+	 *
 	 * @param names Nazwy wierzchołków
 	 * @return Identyfikatory wierzchołków
 	 * @see Vertices#create(String...)
@@ -87,6 +112,7 @@ public class Graph {
 
 	/**
 	 * Dodaje nienazwane wierzchołki do grafu.
+	 *
 	 * @param n Liczba wierzchołków
 	 * @return Identyfikatory wierzchołków
 	 * @see Vertices#create(int)
@@ -98,6 +124,7 @@ public class Graph {
 
 	/**
 	 * Usuwa wierzchołek z grafu.
+	 *
 	 * @param id Identyfikator wierzchołka
 	 * @see Vertices#remove(Integer)
 	 * @since 1.0
@@ -108,6 +135,7 @@ public class Graph {
 
 	/**
 	 * Usuwa wierzchołki z grafu.
+	 *
 	 * @param ids Identyfikatory wierzchołków
 	 * @see Vertices#remove(Integer...)
 	 * @since 1.0
@@ -118,7 +146,8 @@ public class Graph {
 
 	/**
 	 * Ustawia nazwę wierzchołka.
-	 * @param id Identyfikator wierzchołka
+	 *
+	 * @param id   Identyfikator wierzchołka
 	 * @param name Nowa nazwa wierzchołka
 	 * @see Vertices#setName(Integer, String)
 	 * @since 1.0
@@ -129,6 +158,7 @@ public class Graph {
 
 	/**
 	 * Zwraca nazwę wierzchołka.
+	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Nazwa wierzchołka
 	 * @see Vertices#getName(Integer)
@@ -140,19 +170,21 @@ public class Graph {
 
 	/**
 	 * Sprawdza, czy wierzchołek istnieje.
+	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Czy wierzchołek istnieje
-	 * @see Vertices#contains(Integer)
+	 * @see Vertices#exists(Integer)
 	 * @since 1.0
 	 */
-	public boolean containsVertex(Integer id) {
-		return VERTICES.contains(id);
+	public boolean existsVertex(Integer id) {
+		return VERTICES.exists(id);
 	}
 
 	/**
 	 * Dodaje krawędź do grafu.
-	 * @param id1 Identyfikator pierwszego wierzchołka
-	 * @param id2 Identyfikator drugiego wierzchołka
+	 *
+	 * @param id1    Identyfikator pierwszego wierzchołka
+	 * @param id2    Identyfikator drugiego wierzchołka
 	 * @param weight Waga krawędzi
 	 * @see Edges#create(Integer, Integer, Double)
 	 * @since 1.0
@@ -163,8 +195,9 @@ public class Graph {
 
 	/**
 	 * Zmienia wagę krawędzi.
-	 * @param id1 Identyfikator pierwszego wierzchołka
-	 * @param id2 Identyfikator drugiego wierzchołka
+	 *
+	 * @param id1    Identyfikator pierwszego wierzchołka
+	 * @param id2    Identyfikator drugiego wierzchołka
 	 * @param weight Nowa waga krawędzi
 	 * @see Edges#edit(Integer, Integer, Double)
 	 * @since 1.0
@@ -175,6 +208,7 @@ public class Graph {
 
 	/**
 	 * Usuwa krawędź z grafu.
+	 *
 	 * @param id1 Identyfikator pierwszego wierzchołka
 	 * @param id2 Identyfikator drugiego wierzchołka
 	 * @see Edges#remove(Integer, Integer)
@@ -186,6 +220,7 @@ public class Graph {
 
 	/**
 	 * Usuwa wszystkie krawędzie z wierzchołka.
+	 *
 	 * @param id Identyfikator wierzchołka
 	 * @see Edges#removeAll(Integer)
 	 * @since 1.0
@@ -196,6 +231,7 @@ public class Graph {
 
 	/**
 	 * Sprawdza, czy krawędź istnieje.
+	 *
 	 * @param id1 Identyfikator pierwszego wierzchołka
 	 * @param id2 Identyfikator drugiego wierzchołka
 	 * @return Czy krawędź istnieje
@@ -208,6 +244,7 @@ public class Graph {
 
 	/**
 	 * Sprawdza, czy wierzchołek ma jakieś krawędzie.
+	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Czy wierzchołek ma jakieś krawędzie
 	 * @see Edges#exists(Integer)
@@ -219,6 +256,7 @@ public class Graph {
 
 	/**
 	 * Zwraca wagę krawędzi.
+	 *
 	 * @param id1 Identyfikator pierwszego wierzchołka
 	 * @param id2 Identyfikator drugiego wierzchołka
 	 * @return Waga krawędzi
@@ -231,27 +269,31 @@ public class Graph {
 
 	/**
 	 * Klasa wewnętrzna reprezentująca wierzchołki grafu.
+	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 1.0
+	 * @version 1.1
 	 * @since 1.0
 	 */
-	private class Vertices {
-		/**
-		 * Zajęte identyfikatory wierzchołków.
-		 * @since 1.0
-		 */
-		private final List<Integer> ids;
+	protected class Vertices {
 		/**
 		 * Lista wierzchołków.
+		 *
 		 * @since 1.0
 		 */
 		private final List<Vertex> vertices;
+		/**
+		 * Zajęte identyfikatory wierzchołków.
+		 *
+		 * @since 1.0
+		 */
+		protected List<Integer> ids;
 
 		/**
 		 * Konstruktor klasy Vertices
 		 * <p>
-		 *     Tworzy nową listę wierzchołków i listę zajętych identyfikatorów.
+		 * Tworzy nową listę wierzchołków i listę zajętych identyfikatorów.
 		 * </p>
+		 *
 		 * @since 1.0
 		 */
 		public Vertices() {
@@ -261,6 +303,7 @@ public class Graph {
 
 		/**
 		 * Tworzy nowy nienazwany wierzchołek.
+		 *
 		 * @return Identyfikator nowego wierzchołka
 		 * @see Vertex#Vertex(Integer)
 		 * @since 1.0
@@ -274,6 +317,7 @@ public class Graph {
 
 		/**
 		 * Tworzy nowe nienazwane wierzchołki.
+		 *
 		 * @param n Liczba wierzchołków
 		 * @return Identyfikatory nowych wierzchołków
 		 * @see Vertices#create()
@@ -289,6 +333,7 @@ public class Graph {
 
 		/**
 		 * Tworzy nowy wierzchołek.
+		 *
 		 * @param name Nazwa wierzchołka
 		 * @return Identyfikator nowego wierzchołka
 		 * @see Vertex#Vertex(Integer, String)
@@ -303,23 +348,25 @@ public class Graph {
 
 		/**
 		 * Tworzy nowe wierzchołki.
-		 * @param name Nazwy wierzchołków
+		 *
+		 * @param names Nazwy wierzchołków
 		 * @return Identyfikatory nowych wierzchołków
 		 * @see Vertices#create(String)
 		 * @since 1.0
 		 */
-		public Integer @NotNull [] create(String @NotNull ... name) {
-			Integer[] ids = new Integer[name.length];
-			for (int i = 0; i < name.length; i++) {
-				ids[i] = create(name[i]);
+		public Integer @NotNull [] create(String @NotNull ... names) {
+			Integer[] ids = new Integer[names.length];
+			for (int i = 0; i < names.length; i++) {
+				ids[i] = create(names[i]);
 			}
 			return ids;
 		}
 
 		/**
 		 * Usuwa wierzchołek z grafu.
+		 *
 		 * @param id Identyfikator wierzchołka
-		 * @exception NoSuchElementException Wierzchołek o podanym id nie istnieje
+		 * @throws NoSuchElementException Wierzchołek o podanym id nie istnieje
 		 * @since 1.0
 		 */
 		public void remove(Integer id) {
@@ -327,12 +374,13 @@ public class Graph {
 				throw new NoSuchElementException("Vertex with this id does not exist");
 			}
 			EDGES.removeAll(id);
-			ids.remove(id);
+			ids.removeIf(i -> i.equals(id));
 			vertices.removeIf(v -> v.equals(id));
 		}
 
 		/**
 		 * Usuwa wierzchołki z grafu.
+		 *
 		 * @param ids Identyfikatory wierzchołków
 		 * @see Vertices#remove(Integer)
 		 * @since 1.0
@@ -346,8 +394,9 @@ public class Graph {
 		/**
 		 * Konwertuje wierzchołki na Mermaid.
 		 * <p>
-		 *     Wykonuje konwersję wierzchołków na format Mermaid.
+		 * Wykonuje konwersję wierzchołków na format Mermaid.
 		 * </p>
+		 *
 		 * @return Wierzchołki w formacie Mermaid
 		 * @see Vertex#mermaid()
 		 * @since 1.0
@@ -355,69 +404,91 @@ public class Graph {
 		public @NotNull String mermaid() {
 			StringBuilder sb = new StringBuilder();
 			for (Vertex v: vertices) {
-				sb.append(v.mermaid()).append("\n");
+				sb.append("\t").append(v.mermaid()).append("\n");
 			}
 			return sb.toString();
 		}
 
 		/**
 		 * Sprawdza, czy wierzchołek istnieje.
+		 *
 		 * @param id Identyfikator wierzchołka
 		 * @return Czy wierzchołek istnieje
 		 * @since 1.0
 		 */
-		public boolean contains(Integer id) {
-			return ids.contains(id);
+		public boolean exists(Integer id) {
+			for (Integer i: ids) {
+				if (i.equals(id)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Zwraca listę identyfikatorów wierzchołków.
+		 *
+		 * @return Lista identyfikatorów wierzchołków
+		 * @since 1.1
+		 */
+		public List<Integer> getIds() {
+			return ids;
 		}
 
 		/**
 		 * Ustawia nazwę wierzchołka.
-		 * @param id Identyfikator wierzchołka
+		 *
+		 * @param id   Identyfikator wierzchołka
 		 * @param name Nowa nazwa wierzchołka
-		 * @exception NoSuchElementException Wierzchołek o podanym id nie istnieje
+		 * @throws NoSuchElementException Wierzchołek o podanym id nie istnieje
 		 * @since 1.0
 		 */
-		public void setName(Integer id, String name) {
+		public void setName(@NotNull Integer id, String name) {
 			vertices.stream().filter(v -> v.equals(id)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No vertex found with id %d", id))).setName(name);
 		}
 
 		/**
 		 * Zwraca nazwę wierzchołka.
+		 *
 		 * @param id Identyfikator wierzchołka
 		 * @return Nazwa wierzchołka
-		 * @exception NoSuchElementException Wierzchołek o podanym id nie istnieje
+		 * @throws NoSuchElementException Wierzchołek o podanym id nie istnieje
 		 * @since 1.0
 		 */
-		public String getName(Integer id) {
+		public String getName(@NotNull Integer id) {
 			return vertices.stream().filter(v -> v.equals(id)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No vertex found with id %d", id))).getName();
 		}
 
 		/**
 		 * Klasa wewnętrzna reprezentująca wierzchołek grafu.
+		 *
 		 * @author Krzysztof Jurkowski
-		 * @version 1.0
+		 * @version 1.1
 		 * @since 1.0
 		 */
-		private class Vertex {
+		protected class Vertex {
 			/**
 			 * Identyfikator wierzchołka
+			 *
 			 * @since 1.0
 			 */
 			private final Integer id;
 			/**
 			 * Nazwa wierzchołka
+			 *
 			 * @since 1.0
 			 */
-			private String name;
+			protected String name;
 
 			/**
 			 * Konstruktor nienazwanego wierzchołka
 			 * <p>
-			 *     Tworzy nowy wierzchołek o podanym id.
-			 *     Nazwa wierzchołka jest równa id.
+			 * Tworzy nowy wierzchołek o podanym id.<br>
+			 * Nazwa wierzchołka jest równa id.
 			 * </p>
+			 *
 			 * @param id Identyfikator wierzchołka
-			 * @exception IllegalArgumentException Wierzchołek o podanym id już istnieje
+			 * @throws IllegalArgumentException Wierzchołek o podanym id już istnieje
 			 * @since 1.0
 			 */
 			public Vertex(@NotNull Integer id) {
@@ -430,11 +501,12 @@ public class Graph {
 			/**
 			 * Konstruktor wierzchołka
 			 * <p>
-			 *     Tworzy nowy wierzchołek o podanym id i nazwie.
+			 * Tworzy nowy wierzchołek o podanym id i nazwie.
 			 * </p>
-			 * @param id Identyfikator wierzchołka
+			 *
+			 * @param id   Identyfikator wierzchołka
 			 * @param name Nazwa wierzchołka
-			 * @exception IllegalArgumentException Wierzchołek o podanym id już istnieje
+			 * @throws IllegalArgumentException Wierzchołek o podanym id już istnieje
 			 * @since 1.0
 			 */
 			public Vertex(Integer id, String name) {
@@ -446,6 +518,7 @@ public class Graph {
 
 			/**
 			 * Zwraca nazwę wierzchołka.
+			 *
 			 * @return Nazwa wierzchołka
 			 * @since 1.0
 			 */
@@ -455,6 +528,7 @@ public class Graph {
 
 			/**
 			 * Ustawia nazwę wierzchołka.
+			 *
 			 * @param name Nazwa wierzchołka
 			 * @since 1.0
 			 */
@@ -463,7 +537,18 @@ public class Graph {
 			}
 
 			/**
+			 * Zwraca identyfikator wierzchołka.
+			 *
+			 * @return Identyfikator wierzchołka
+			 * @since 1.1
+			 */
+			public Integer getId() {
+				return id;
+			}
+
+			/**
 			 * Sprawdza, czy wierzchołek ma podany id.
+			 *
 			 * @param id Identyfikator wierzchołka
 			 * @return Czy wierzchołek ma podany id
 			 * @since 1.0
@@ -475,36 +560,40 @@ public class Graph {
 			/**
 			 * Konwertuje wierzchołek na Mermaid.
 			 * <p>
-			 *     Wykonuje konwersję wierzchołka na format Mermaid.<br>
-			 *     Format: id("nazwa")
+			 * Wykonuje konwersję wierzchołka na format Mermaid.<br>
+			 * Format: id("nazwa")
 			 * </p>
+			 *
 			 * @return Wierzchołek w formacie Mermaid
 			 * @since 1.0
 			 */
 			public String mermaid() {
-				return String.format("%d(\"%s\")", id, name);
+				return String.format("%d(\"%s\")", getId(), getName());
 			}
 		}
 	}
 
 	/**
 	 * Klasa wewnętrzna reprezentująca krawędzie grafu.
+	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 1.0
+	 * @version 1.1
 	 * @since 1.0
 	 */
-	private class Edges {
+	protected class Edges {
 		/**
 		 * Lista krawędzi
+		 *
 		 * @since 1.0
 		 */
-		private final List<Edge> edges;
+		protected final List<Edge> edges;
 
 		/**
 		 * Konstruktor klasy Edges
 		 * <p>
-		 *     Tworzy nową listę krawędzi.
+		 * Tworzy nową listę krawędzi.
 		 * </p>
+		 *
 		 * @since 1.0
 		 */
 		public Edges() {
@@ -512,28 +601,46 @@ public class Graph {
 		}
 
 		/**
+		 * Konstruktor klasy Edges
+		 * <p>
+		 * Kopiuje krawędzie z innego obiektu Edges.
+		 * </p>
+		 *
+		 * @param edges Krawędzie do skopiowania
+		 * @see #create(Integer, Integer, Double)
+		 * @since 1.1
+		 */
+		public Edges(@NotNull Edges edges) {
+			this.edges = new ArrayList<>();
+			for (Edge e: edges.edges)
+				create(e.v1, e.v2, e.weight);
+		}
+
+		/**
 		 * Dodaje krawędź do grafu.
-		 * @param id1 Identyfikator pierwszego wierzchołka
-		 * @param id2 Identyfikator drugiego wierzchołka
+		 *
+		 * @param id1    Identyfikator pierwszego wierzchołka
+		 * @param id2    Identyfikator drugiego wierzchołka
 		 * @param weight Waga krawędzi
-		 * @exception IllegalArgumentException Krawędź między podanymi wierzchołkami już istnieje
-		 * @exception NoSuchElementException Wierzchołki o podanych id muszą istnieć
+		 * @throws IllegalArgumentException Krawędź między podanymi wierzchołkami już istnieje
+		 * @throws NoSuchElementException   Wierzchołki o podanych id muszą istnieć
 		 * @since 1.0
 		 */
 		public void create(Integer id1, Integer id2, Double weight) {
 			if (exists(id1, id2))
 				throw new IllegalArgumentException(String.format("Edge between %d and %d already exists", id1, id2));
-			if (!VERTICES.contains(id1) || !VERTICES.contains(id2))
+			if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
 				throw new NoSuchElementException(String.format("Vertices %d and %d must exist", id1, id2));
 			edges.add(new Edge(id1, id2, weight));
 		}
 
 		/**
 		 * Edytuje wagę krawędzi.
-		 * @param id1 Identyfikator pierwszego wierzchołka
-		 * @param id2 Identyfikator drugiego wierzchołka
+		 *
+		 * @param id1    Identyfikator pierwszego wierzchołka
+		 * @param id2    Identyfikator drugiego wierzchołka
 		 * @param weight Nowa waga krawędzi
-		 * @exception NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
+		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
 		 */
 		public void edit(Integer id1, Integer id2, Double weight) {
@@ -545,9 +652,10 @@ public class Graph {
 
 		/**
 		 * Usuwa krawędź z grafu.
+		 *
 		 * @param id1 Identyfikator pierwszego wierzchołka
 		 * @param id2 Identyfikator drugiego wierzchołka
-		 * @exception NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
+		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
 		 */
 		public void remove(Integer id1, Integer id2) {
@@ -558,12 +666,13 @@ public class Graph {
 
 		/**
 		 * Usuwa wszystkie krawędzie z wierzchołka.
+		 *
 		 * @param id Identyfikator wierzchołka
-		 * @exception IllegalArgumentException Wierzchołek o podanym id musi istnieć
+		 * @throws IllegalArgumentException Wierzchołek o podanym id musi istnieć
 		 * @since 1.0
 		 */
 		public void removeAll(Integer id) {
-			if (!VERTICES.contains(id))
+			if (!VERTICES.exists(id))
 				throw new IllegalArgumentException(String.format("Vertex %d must exist", id));
 			edges.removeIf(e -> e.connects(id));
 		}
@@ -571,8 +680,9 @@ public class Graph {
 		/**
 		 * Konwertuje krawędzie na Mermaid.
 		 * <p>
-		 *     Wykonuje konwersję krawędzi na format Mermaid.
+		 * Wykonuje konwersję krawędzi na format Mermaid.
 		 * </p>
+		 *
 		 * @return Krawędzie w formacie Mermaid
 		 * @see Edge#mermaid()
 		 * @since 1.0
@@ -580,44 +690,47 @@ public class Graph {
 		public @NotNull String mermaid() {
 			StringBuilder sb = new StringBuilder();
 			for (Edge e: edges) {
-				sb.append(e.mermaid()).append("\n");
+				sb.append("\t").append(e.mermaid()).append("\n");
 			}
 			return sb.toString();
 		}
 
 		/**
 		 * Sprawdza, czy krawędź istnieje.
+		 *
 		 * @param id1 Identyfikator pierwszego wierzchołka
 		 * @param id2 Identyfikator drugiego wierzchołka
 		 * @return Czy krawędź istnieje
-		 * @exception NoSuchElementException Wierzchołki o podanych id muszą istnieć
+		 * @throws NoSuchElementException Wierzchołki o podanych id muszą istnieć
 		 * @since 1.0
 		 */
 		public boolean exists(Integer id1, Integer id2) {
-			if (!VERTICES.contains(id1) || !VERTICES.contains(id2))
+			if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
 				throw new NoSuchElementException(String.format("Vertices %d and %d must exist", id1, id2));
 			return edges.stream().anyMatch(e -> e.connects(id1, id2));
 		}
 
 		/**
 		 * Sprawdza, czy wierzchołek ma jakieś krawędzie.
+		 *
 		 * @param id Identyfikator wierzchołka
 		 * @return Czy wierzchołek ma jakieś krawędzie
-		 * @exception NoSuchElementException Wierzchołek o podanym id musi istnieć
+		 * @throws NoSuchElementException Wierzchołek o podanym id musi istnieć
 		 * @since 1.0
 		 */
 		public boolean exists(Integer id) {
-			if (!VERTICES.contains(id))
+			if (!VERTICES.exists(id))
 				throw new NoSuchElementException(String.format("Vertex %d must exist", id));
 			return edges.stream().anyMatch(e -> e.connects(id));
 		}
 
 		/**
 		 * Zwraca wagę krawędzi.
+		 *
 		 * @param id1 Identyfikator pierwszego wierzchołka
 		 * @param id2 Identyfikator drugiego wierzchołka
 		 * @return Waga krawędzi
-		 * @exception NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
+		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
 		 */
 		public Double getWeight(Integer id1, Integer id2) {
@@ -626,40 +739,45 @@ public class Graph {
 
 		/**
 		 * Klasa wewnętrzna reprezentująca krawędź grafu.
+		 *
 		 * @author Krzysztof Jurkowski
-		 * @version 1.0
+		 * @version 1.1
 		 * @since 1.0
 		 */
-		private class Edge {
+		protected class Edge {
 			/**
 			 * Identyfikator pierwszego wierzchołka
+			 *
 			 * @since 1.0
 			 */
-			private final Integer v1;
+			protected final Integer v1;
 			/**
 			 * Identyfikator drugiego wierzchołka
+			 *
 			 * @since 1.0
 			 */
-			private final Integer v2;
+			protected final Integer v2;
 			/**
 			 * Waga krawędzi
+			 *
 			 * @since 1.0
 			 */
-			private final Double weight;
+			protected final Double weight;
 
 			/**
 			 * Konstruktor klasy Edge
 			 * <p>
-			 *     Tworzy nową krawędź między podanymi wierzchołkami.
+			 * Tworzy nową krawędź między podanymi wierzchołkami.
 			 * </p>
-			 * @param id1 Identyfikator pierwszego wierzchołka
-			 * @param id2 Identyfikator drugiego wierzchołka
+			 *
+			 * @param id1    Identyfikator pierwszego wierzchołka
+			 * @param id2    Identyfikator drugiego wierzchołka
 			 * @param weight Waga krawędzi
-			 * @exception NoSuchElementException Wierzchołki o podanych id muszą istnieć
+			 * @throws NoSuchElementException Wierzchołki o podanych id muszą istnieć
 			 * @since 1.0
 			 */
 			public Edge(Integer id1, Integer id2, Double weight) {
-				if (VERTICES.contains(id1) || VERTICES.contains(id2))
+				if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
 					throw new NoSuchElementException(String.format("Vertices %d and %d must exist", id1, id2));
 				this.v1 = id1;
 				this.v2 = id2;
@@ -668,6 +786,7 @@ public class Graph {
 
 			/**
 			 * Zwraca wagę krawędzi.
+			 *
 			 * @return Waga krawędzi
 			 * @since 1.0
 			 */
@@ -677,6 +796,7 @@ public class Graph {
 
 			/**
 			 * Sprawdza, czy krawędź łączy wierzchołek o podanym id.
+			 *
 			 * @param id Identyfikator wierzchołka
 			 * @return Czy krawędź łączy wierzchołek
 			 * @since 1.0
@@ -687,6 +807,7 @@ public class Graph {
 
 			/**
 			 * Sprawdza, czy krawędź łączy wierzchołki o podanych id.
+			 *
 			 * @param id1 Identyfikator pierwszego wierzchołka
 			 * @param id2 Identyfikator drugiego wierzchołka
 			 * @return Czy krawędź łączy wierzchołki
@@ -700,14 +821,15 @@ public class Graph {
 			/**
 			 * Konwertuje krawędź na Mermaid.
 			 * <p>
-			 *     Wykonuje konwersję krawędzi na format Mermaid.<br>
-			 *     Format: id1 ---|waga| id2
+			 * Wykonuje konwersję krawędzi na format Mermaid.<br>
+			 * Format: id1 ---|waga| id2
 			 * </p>
+			 *
 			 * @return Krawędź w formacie Mermaid
 			 * @since 1.0
 			 */
 			public String mermaid() {
-				return String.format("%d ---|%f| %d", v1, weight, v2);
+				return String.format("%d ---|%f| %d", v1, getWeight(), v2);
 			}
 		}
 

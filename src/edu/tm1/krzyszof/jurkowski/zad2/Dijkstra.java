@@ -9,7 +9,7 @@ import java.util.*;
  * Klasa implementująca algorytm Dijkstry
  *
  * @author Krzysztof Jurkowski
- * @version 2.0
+ * @version 2.1
  * @see Graph
  * @since zad2
  */
@@ -20,6 +20,12 @@ public class Dijkstra extends Graph {
 	 * @since 2.0
 	 */
 	private final Integer src;
+	/**
+	 * Czy został wykonany algorytm Dijkstry?
+	 *
+	 * @since 2.1
+	 */
+	private boolean calculated;
 	/**
 	 * Wynik algorytmu Dijkstry
 	 *
@@ -39,6 +45,7 @@ public class Dijkstra extends Graph {
 		super();
 		RESULT = new ResultVertices();
 		src = null;
+		calculated = false;
 	}
 
 	/**
@@ -54,6 +61,7 @@ public class Dijkstra extends Graph {
 		super(graph);
 		RESULT = new ResultVertices();
 		src = null;
+		calculated = false;
 	}
 
 	/**
@@ -79,6 +87,7 @@ public class Dijkstra extends Graph {
 	 * @since 2.0
 	 */
 	public void calculate() {
+		if(calculated) return;
 		if (src == null) {
 			throw new IllegalStateException("Source vertex not set");
 		}
@@ -110,6 +119,7 @@ public class Dijkstra extends Graph {
 			}
 		}
 
+		calculated = true;
 	}
 
 	/**
@@ -121,6 +131,8 @@ public class Dijkstra extends Graph {
 	 * @since 2.0
 	 */
 	public String mermaidResult() {
+		if (!calculated)
+			calculate();
 		return String.format("graph\n%s", RESULT.mermaid());
 	}
 
@@ -134,9 +146,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public Integer addVertex(String name) {
-		Integer o = VERTICES.create(name);
-		calculate();
-		return o;
+		calculated = false;
+		return VERTICES.create(name);
 	}
 
 	/**
@@ -148,9 +159,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public Integer addVertex() {
-		Integer o = VERTICES.create();
-		calculate();
-		return o;
+		calculated = false;
+		return VERTICES.create();
 	}
 
 	/**
@@ -163,9 +173,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public Integer[] addVertex(String @NotNull ... names) {
-		Integer[] o = VERTICES.create(names);
-		calculate();
-		return o;
+		calculated = false;
+		return VERTICES.create(names);
 	}
 
 	/**
@@ -178,9 +187,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public Integer[] addVertex(int n) {
-		Integer[] o = VERTICES.create(n);
-		calculate();
-		return o;
+		calculated = false;
+		return VERTICES.create(n);
 	}
 
 	/**
@@ -192,8 +200,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public void removeVertex(Integer id) {
+		calculated = false;
 		VERTICES.remove(id);
-		calculate();
 	}
 
 	/**
@@ -205,8 +213,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public void removeVertex(Integer @NotNull ... ids) {
+		calculated = false;
 		VERTICES.remove(ids);
-		calculate();
 	}
 
 	/**
@@ -219,8 +227,8 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public void setVertexName(Integer id, String name) {
+		calculated = false;
 		VERTICES.setName(id, name);
-		calculate();
 	}
 
 	/**
@@ -232,6 +240,8 @@ public class Dijkstra extends Graph {
 	 * @since 2.0
 	 */
 	public Double getVertexCost(Integer id) {
+		if (!calculated)
+			calculate();
 		return RESULT.getCost(id);
 	}
 
@@ -244,6 +254,8 @@ public class Dijkstra extends Graph {
 	 * @since 2.0
 	 */
 	public Integer getVertexPrevious(Integer id) {
+		if (!calculated)
+			calculate();
 		return RESULT.getPrevious(id);
 	}
 
@@ -259,7 +271,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void addEdge(Integer id1, Integer id2, Double weight) {
 		EDGES.create(id1, id2, weight);
-		calculate();
+		calculated = false;
 	}
 
 	/**
@@ -274,7 +286,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void editEdge(Integer id1, Integer id2, Double weight) {
 		EDGES.edit(id1, id2, weight);
-		calculate();
+		calculated = false;
 	}
 
 	/**
@@ -288,7 +300,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void removeEdge(Integer id1, Integer id2) {
 		EDGES.remove(id1, id2);
-		calculate();
+		calculated = false;
 	}
 
 	/**
@@ -301,7 +313,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void removeAllEdges(Integer id) {
 		EDGES.removeAll(id);
-		calculate();
+		calculated = false;
 	}
 
 	/**

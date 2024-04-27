@@ -9,7 +9,7 @@ import java.util.*;
  * Klasa implementująca algorytm Dijkstry
  *
  * @author Krzysztof Jurkowski
- * @version 2.1
+ * @version 2.2
  * @see Graph
  * @since zad2
  */
@@ -19,7 +19,7 @@ public class Dijkstra extends Graph {
 	 *
 	 * @since 2.0
 	 */
-	private final Integer src;
+	private Integer src;
 	/**
 	 * Czy został wykonany algorytm Dijkstry?
 	 *
@@ -43,7 +43,6 @@ public class Dijkstra extends Graph {
 	 */
 	public Dijkstra() {
 		super();
-		RESULT = new ResultVertices();
 		src = null;
 		calculated = false;
 	}
@@ -59,7 +58,6 @@ public class Dijkstra extends Graph {
 	 */
 	public Dijkstra(@NotNull Graph graph) {
 		super(graph);
-		RESULT = new ResultVertices();
 		src = null;
 		calculated = false;
 	}
@@ -72,27 +70,27 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param graph Graf
 	 * @param src   Identyfikator wierzchołka źródłowego
+	 * @see #setSource(Integer)
 	 * @see #calculate()
 	 * @since 2.0
 	 */
 	public Dijkstra(@NotNull Graph graph, @NotNull Integer src) {
 		super(graph);
-		this.src = src;
+		setSource(src);
 		calculate();
 	}
 
 	/**
 	 * Wykonuje algorytm Dijkstry na grafie.
 	 *
+	 * @throws IllegalStateException Wierzchołek źródłowy nie jest ustawiony
 	 * @since 2.0
 	 */
 	public void calculate() {
-		if(calculated) return;
+		if (calculated)
+			return;
 		if (src == null) {
 			throw new IllegalStateException("Source vertex not set");
-		}
-		if (!VERTICES.exists(src)) {
-			throw new NoSuchElementException(String.format("Vertex with id %d does not exist", src));
 		}
 
 		RESULT = new ResultVertices(VERTICES, src);
@@ -123,14 +121,30 @@ public class Dijkstra extends Graph {
 	}
 
 	/**
+	 * Wykonuje algorytm Dijkstry na grafie.
+	 * <p>
+	 * Metoda wykonuje algorytm Dijkstry na grafie z wierzchołkiem źródłowym.
+	 * </p>
+	 *
+	 * @param source Identyfikator wierzchołka źródłowego
+	 * @see #setSource(Integer)
+	 * @see #calculate()
+	 * @since 2.2
+	 */
+	public void calculate(@NotNull Integer source) {
+		setSource(source);
+		calculate();
+	}
+
+	/**
 	 * Konwertuje wynik algorytmu Dijkstry na graf w formacie Mermaid
 	 *
 	 * @return Graf z wynikiem algorytmu Dijkstry
+	 * @see #calculate()
 	 * @see ResultVertices#mermaid()
-	 * @see Edges#mermaid()
 	 * @since 2.0
 	 */
-	public String mermaidResult() {
+	public @NotNull String mermaidResult() {
 		if (!calculated)
 			calculate();
 		return String.format("graph\n%s", RESULT.mermaid());
@@ -145,7 +159,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public Integer addVertex(String name) {
+	public @NotNull Integer addVertex(String name) {
 		calculated = false;
 		return VERTICES.create(name);
 	}
@@ -158,7 +172,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public Integer addVertex() {
+	public @NotNull Integer addVertex() {
 		calculated = false;
 		return VERTICES.create();
 	}
@@ -172,7 +186,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public Integer[] addVertex(String @NotNull ... names) {
+	public Integer @NotNull [] addVertex(String @NotNull ... names) {
 		calculated = false;
 		return VERTICES.create(names);
 	}
@@ -186,7 +200,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public Integer[] addVertex(int n) {
+	public Integer @NotNull [] addVertex(int n) {
 		calculated = false;
 		return VERTICES.create(n);
 	}
@@ -199,7 +213,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void removeVertex(Integer id) {
+	public void removeVertex(@NotNull Integer id) {
 		calculated = false;
 		VERTICES.remove(id);
 	}
@@ -226,7 +240,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void setVertexName(Integer id, String name) {
+	public void setVertexName(@NotNull Integer id, String name) {
 		calculated = false;
 		VERTICES.setName(id, name);
 	}
@@ -236,10 +250,11 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Koszt dotarcia do wierzchołka
+	 * @see #calculate()
 	 * @see ResultVertices#getCost(Integer)
 	 * @since 2.0
 	 */
-	public Double getVertexCost(Integer id) {
+	public @NotNull Double getVertexCost(@NotNull Integer id) {
 		if (!calculated)
 			calculate();
 		return RESULT.getCost(id);
@@ -250,10 +265,11 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Identyfikator poprzedniego wierzchołka
+	 * @see #calculate()
 	 * @see ResultVertices#getPrevious(Integer)
 	 * @since 2.0
 	 */
-	public Integer getVertexPrevious(Integer id) {
+	public Integer getVertexPrevious(@NotNull Integer id) {
 		if (!calculated)
 			calculate();
 		return RESULT.getPrevious(id);
@@ -269,7 +285,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void addEdge(Integer id1, Integer id2, Double weight) {
+	public void addEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 		EDGES.create(id1, id2, weight);
 		calculated = false;
 	}
@@ -282,9 +298,12 @@ public class Dijkstra extends Graph {
 	 * @param weight Nowa waga krawędzi
 	 * @see Edges#edit(Integer, Integer, Double)
 	 * @since 1.0
+	 * @deprecated Od wersji 2.2 użyj {@link #setEdgeWeight(Integer, Integer, Double)}
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
-	public void editEdge(Integer id1, Integer id2, Double weight) {
+	@Deprecated
+	public void editEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 		EDGES.edit(id1, id2, weight);
 		calculated = false;
 	}
@@ -298,7 +317,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void removeEdge(Integer id1, Integer id2) {
+	public void removeEdge(@NotNull Integer id1, @NotNull Integer id2) {
 		EDGES.remove(id1, id2);
 		calculated = false;
 	}
@@ -311,8 +330,37 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void removeAllEdges(Integer id) {
+	public void removeAllEdges(@NotNull Integer id) {
 		EDGES.removeAll(id);
+		calculated = false;
+	}
+
+	/**
+	 * Ustawia wierzchołek źródłowy
+	 *
+	 * @param source Identyfikator wierzchołka
+	 * @throws NoSuchElementException Wierzchołek o podanym id nie istnieje
+	 * @since 2.2
+	 */
+	public void setSource(@NotNull Integer source) {
+		if (VERTICES.exists(source))
+			throw new NoSuchElementException(String.format("Vertex with id %d does not exist", source));
+		src = source;
+		calculated = false;
+	}
+
+	/**
+	 * Ustawia wagę krawędzi
+	 *
+	 * @param id1    Identyfikator pierwszego wierzchołka
+	 * @param id2    Identyfikator drugiego wierzchołka
+	 * @param weight Nowa waga krawędzi
+	 * @see Edges#setWeight(Integer, Integer, Double)
+	 * @since 2.2
+	 */
+	@Override
+	public void setEdgeWeight(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
+		EDGES.setWeight(id1, id2, weight);
 		calculated = false;
 	}
 
@@ -323,7 +371,7 @@ public class Dijkstra extends Graph {
 	 * </p>
 	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 2.0
+	 * @version 2.1
 	 * @since 2.0
 	 */
 	private class ResultVertices extends Vertices {
@@ -356,7 +404,7 @@ public class Dijkstra extends Graph {
 		 * @param vertices Lista wierzchołków
 		 * @since 2.0
 		 */
-		public ResultVertices(@NotNull Vertices vertices, Integer src) {
+		public ResultVertices(@NotNull Vertices vertices, @NotNull Integer src) {
 			ids = new ArrayList<>();
 			this.vertices = new ArrayList<>();
 			for (Integer id: vertices.getIds()) {
@@ -461,7 +509,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#ResultVertex(Integer, String)
 		 * @since 2.0
 		 */
-		public void create(Integer id, String name) {
+		public void create(@NotNull Integer id, String name) {
 			if (!ids.isEmpty())
 				throw new UnsupportedOperationException("Method not supported");
 			vertices.add(new ResultVertex(id, name));
@@ -481,7 +529,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#ResultVertex(Integer, String, Double, Integer)
 		 * @since 2.0
 		 */
-		public void create(@NotNull Vertex vertex, Double cost, Integer previous) {
+		public void create(@NotNull Vertex vertex, @NotNull Double cost, Integer previous) {
 			if (ids.contains(vertex.getId())) {
 				throw new IllegalArgumentException(String.format("Vertex with id %d already exists", vertex.getId()));
 			}
@@ -499,7 +547,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#ResultVertex(Integer, Double, Integer)
 		 * @since 2.0
 		 */
-		public void create(Integer id, Double cost, Integer previous) {
+		public void create(@NotNull Integer id, @NotNull Double cost, Integer previous) {
 			if (ids.contains(id)) {
 				throw new IllegalArgumentException(String.format("Vertex with id %d already exists", id));
 			}
@@ -517,7 +565,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#ResultVertex(Integer, String, Double, Integer)
 		 * @since 2.0
 		 */
-		public void create(Integer id, String name, Double cost, Integer previous) {
+		public void create(@NotNull Integer id, String name, @NotNull Double cost, Integer previous) {
 			if (ids.contains(id)) {
 				throw new IllegalArgumentException(String.format("Vertex with id %d already exists", id));
 			}
@@ -536,7 +584,7 @@ public class Dijkstra extends Graph {
 		 * @see #create(Integer, String, Double, Integer)
 		 * @since 2.0
 		 */
-		public @NotNull Integer create(String name, Double cost, Integer previous) {
+		public @NotNull Integer create(String name, @NotNull Double cost, Integer previous) {
 			if (ids.isEmpty()) {
 				throw new UnsupportedOperationException("Method not supported");
 			}
@@ -644,7 +692,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#setCost(Double)
 		 * @since 2.0
 		 */
-		public void setCost(@NotNull Integer id, Double cost) {
+		public void setCost(@NotNull Integer id, @NotNull Double cost) {
 			vertices.stream().filter(v -> v.equals(id)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No vertex found with id %d", id))).setCost(cost);
 		}
 
@@ -657,7 +705,7 @@ public class Dijkstra extends Graph {
 		 * @see ResultVertex#getCost()
 		 * @since 2.0
 		 */
-		public Double getCost(@NotNull Integer id) {
+		public @NotNull Double getCost(@NotNull Integer id) {
 			return vertices.stream().filter(v -> v.equals(id)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No vertex found with id %d", id))).getCost();
 		}
 
@@ -694,7 +742,7 @@ public class Dijkstra extends Graph {
 		 * </p>
 		 *
 		 * @author Krzysztof Jurkowski
-		 * @version 2.0
+		 * @version 2.1
 		 * @since 2.0
 		 */
 		private class ResultVertex extends Graph.Vertices.Vertex {
@@ -703,7 +751,7 @@ public class Dijkstra extends Graph {
 			 *
 			 * @since 2.0
 			 */
-			private Double cost;
+			private @NotNull Double cost;
 			/**
 			 * Poprzedni wierzchołek
 			 *
@@ -745,7 +793,7 @@ public class Dijkstra extends Graph {
 			 * @see Graph.Vertices.Vertex#Vertex(Integer, String)
 			 * @since 1.0
 			 */
-			public ResultVertex(Integer id, String name) {
+			public ResultVertex(@NotNull Integer id, String name) {
 				super(id, name);
 				cost = 0.0;
 				previous = null;
@@ -765,7 +813,7 @@ public class Dijkstra extends Graph {
 			 * @see Graph.Vertices.Vertex#Vertex(Integer)
 			 * @since 2.0
 			 */
-			public ResultVertex(@NotNull Integer id, Double cost, Integer previous) {
+			public ResultVertex(@NotNull Integer id, @NotNull Double cost, Integer previous) {
 				super(id);
 				this.cost = cost;
 				this.previous = previous;
@@ -785,7 +833,7 @@ public class Dijkstra extends Graph {
 			 * @see Graph.Vertices.Vertex#Vertex(Integer, String)
 			 * @since 2.0
 			 */
-			public ResultVertex(Integer id, String name, Double cost, Integer previous) {
+			public ResultVertex(@NotNull Integer id, String name, @NotNull Double cost, Integer previous) {
 				super(id, name);
 				this.cost = cost;
 				this.previous = previous;
@@ -797,7 +845,7 @@ public class Dijkstra extends Graph {
 			 * @return Koszt dojścia do wierzchołka
 			 * @since 2.0
 			 */
-			public Double getCost() {
+			public @NotNull Double getCost() {
 				return cost;
 			}
 
@@ -807,7 +855,7 @@ public class Dijkstra extends Graph {
 			 * @param cost Koszt dojścia do wierzchołka
 			 * @since 2.0
 			 */
-			public void setCost(Double cost) {
+			public void setCost(@NotNull Double cost) {
 				this.cost = cost;
 			}
 
@@ -841,7 +889,7 @@ public class Dijkstra extends Graph {
 			 * @since 2.0
 			 */
 			@Override
-			public String mermaid() {
+			public @NotNull String mermaid() {
 				return String.format("%d(\"(%f) %s\")", getId(), cost, name);
 			}
 		}

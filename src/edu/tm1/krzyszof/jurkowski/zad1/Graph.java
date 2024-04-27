@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  * </p>
  *
  * @author Krzysztof Jurkowski
- * @version 1.1
+ * @version 1.2
  * @since zad1
  */
 public class Graph {
@@ -56,8 +56,8 @@ public class Graph {
 	 * @since 1.1
 	 */
 	public Graph(@NotNull Graph graph) {
-		VERTICES = graph.VERTICES;
-		EDGES = graph.EDGES;
+		VERTICES = new Vertices(graph.VERTICES);
+		EDGES = new Edges(graph.EDGES);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class Graph {
 	 * @see Edges#mermaid()
 	 * @since 1.0
 	 */
-	public String mermaid() {
+	public @NotNull String mermaid() {
 		return "graph\n" + VERTICES.mermaid() + EDGES.mermaid();
 	}
 
@@ -83,7 +83,7 @@ public class Graph {
 	 * @see Vertices#create(String)
 	 * @since 1.0
 	 */
-	public Integer addVertex(String name) {
+	public @NotNull Integer addVertex(String name) {
 		return VERTICES.create(name);
 	}
 
@@ -94,7 +94,7 @@ public class Graph {
 	 * @see Vertices#create()
 	 * @since 1.0
 	 */
-	public Integer addVertex() {
+	public @NotNull Integer addVertex() {
 		return VERTICES.create();
 	}
 
@@ -106,7 +106,7 @@ public class Graph {
 	 * @see Vertices#create(String...)
 	 * @since 1.0
 	 */
-	public Integer[] addVertex(String @NotNull ... names) {
+	public Integer @NotNull [] addVertex(String @NotNull ... names) {
 		return VERTICES.create(names);
 	}
 
@@ -118,7 +118,7 @@ public class Graph {
 	 * @see Vertices#create(int)
 	 * @since 1.0
 	 */
-	public Integer[] addVertex(int n) {
+	public Integer @NotNull [] addVertex(int n) {
 		return VERTICES.create(n);
 	}
 
@@ -129,7 +129,7 @@ public class Graph {
 	 * @see Vertices#remove(Integer)
 	 * @since 1.0
 	 */
-	public void removeVertex(Integer id) {
+	public void removeVertex(@NotNull Integer id) {
 		VERTICES.remove(id);
 	}
 
@@ -152,7 +152,7 @@ public class Graph {
 	 * @see Vertices#setName(Integer, String)
 	 * @since 1.0
 	 */
-	public void setVertexName(Integer id, String name) {
+	public void setVertexName(@NotNull Integer id, String name) {
 		VERTICES.setName(id, name);
 	}
 
@@ -164,7 +164,7 @@ public class Graph {
 	 * @see Vertices#getName(Integer)
 	 * @since 1.0
 	 */
-	public String getVertexName(Integer id) {
+	public String getVertexName(@NotNull Integer id) {
 		return VERTICES.getName(id);
 	}
 
@@ -176,7 +176,7 @@ public class Graph {
 	 * @see Vertices#exists(Integer)
 	 * @since 1.0
 	 */
-	public boolean existsVertex(Integer id) {
+	public boolean existsVertex(@NotNull Integer id) {
 		return VERTICES.exists(id);
 	}
 
@@ -189,7 +189,7 @@ public class Graph {
 	 * @see Edges#create(Integer, Integer, Double)
 	 * @since 1.0
 	 */
-	public void addEdge(Integer id1, Integer id2, Double weight) {
+	public void addEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 		EDGES.create(id1, id2, weight);
 	}
 
@@ -201,8 +201,10 @@ public class Graph {
 	 * @param weight Nowa waga krawędzi
 	 * @see Edges#edit(Integer, Integer, Double)
 	 * @since 1.0
+	 * @deprecated Od wersji 1.2 użyj {@link #setEdgeWeight(Integer, Integer, Double)}
 	 */
-	public void editEdge(Integer id1, Integer id2, Double weight) {
+	@Deprecated
+	public void editEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 		EDGES.edit(id1, id2, weight);
 	}
 
@@ -214,7 +216,7 @@ public class Graph {
 	 * @see Edges#remove(Integer, Integer)
 	 * @since 1.0
 	 */
-	public void removeEdge(Integer id1, Integer id2) {
+	public void removeEdge(@NotNull Integer id1, @NotNull Integer id2) {
 		EDGES.remove(id1, id2);
 	}
 
@@ -225,7 +227,7 @@ public class Graph {
 	 * @see Edges#removeAll(Integer)
 	 * @since 1.0
 	 */
-	public void removeAllEdges(Integer id) {
+	public void removeAllEdges(@NotNull Integer id) {
 		EDGES.removeAll(id);
 	}
 
@@ -238,7 +240,7 @@ public class Graph {
 	 * @see Edges#exists(Integer, Integer)
 	 * @since 1.0
 	 */
-	public boolean existsEdge(Integer id1, Integer id2) {
+	public boolean existsEdge(@NotNull Integer id1, @NotNull Integer id2) {
 		return EDGES.exists(id1, id2);
 	}
 
@@ -250,7 +252,7 @@ public class Graph {
 	 * @see Edges#exists(Integer)
 	 * @since 1.0
 	 */
-	public boolean existsEdge(Integer id) {
+	public boolean existsAnyEdge(@NotNull Integer id) {
 		return EDGES.exists(id);
 	}
 
@@ -263,15 +265,28 @@ public class Graph {
 	 * @see Edges#getWeight(Integer, Integer)
 	 * @since 1.0
 	 */
-	public Double getEdgeWeight(Integer id1, Integer id2) {
+	public @NotNull Double getEdgeWeight(@NotNull Integer id1, @NotNull Integer id2) {
 		return EDGES.getWeight(id1, id2);
+	}
+
+	/**
+	 * Ustawia wagę krawędzi.
+	 *
+	 * @param id1    Identyfikator pierwszego wierzchołka
+	 * @param id2    Identyfikator drugiego wierzchołka
+	 * @param weight Waga krawędzi
+	 * @see Edges#setWeight(Integer, Integer, Double)
+	 * @since 1.2
+	 */
+	public void setEdgeWeight(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
+		EDGES.edit(id1, id2, weight);
 	}
 
 	/**
 	 * Klasa wewnętrzna reprezentująca wierzchołki grafu.
 	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 1.1
+	 * @version 1.2
 	 * @since 1.0
 	 */
 	protected class Vertices {
@@ -299,6 +314,11 @@ public class Graph {
 		public Vertices() {
 			ids = new ArrayList<>();
 			vertices = new ArrayList<>();
+		}
+
+		public Vertices(@NotNull Vertices vertices) {
+			this.ids = new ArrayList<>(vertices.ids);
+			this.vertices = new ArrayList<>(vertices.vertices);
 		}
 
 		/**
@@ -369,7 +389,7 @@ public class Graph {
 		 * @throws NoSuchElementException Wierzchołek o podanym id nie istnieje
 		 * @since 1.0
 		 */
-		public void remove(Integer id) {
+		public void remove(@NotNull Integer id) {
 			if (!ids.contains(id)) {
 				throw new NoSuchElementException("Vertex with this id does not exist");
 			}
@@ -416,7 +436,7 @@ public class Graph {
 		 * @return Czy wierzchołek istnieje
 		 * @since 1.0
 		 */
-		public boolean exists(Integer id) {
+		public boolean exists(@NotNull Integer id) {
 			for (Integer i: ids) {
 				if (i.equals(id)) {
 					return true;
@@ -463,7 +483,7 @@ public class Graph {
 		 * Klasa wewnętrzna reprezentująca wierzchołek grafu.
 		 *
 		 * @author Krzysztof Jurkowski
-		 * @version 1.1
+		 * @version 1.2
 		 * @since 1.0
 		 */
 		protected class Vertex {
@@ -472,7 +492,7 @@ public class Graph {
 			 *
 			 * @since 1.0
 			 */
-			private final Integer id;
+			private final @NotNull Integer id;
 			/**
 			 * Nazwa wierzchołka
 			 *
@@ -509,7 +529,7 @@ public class Graph {
 			 * @throws IllegalArgumentException Wierzchołek o podanym id już istnieje
 			 * @since 1.0
 			 */
-			public Vertex(Integer id, String name) {
+			public Vertex(@NotNull Integer id, String name) {
 				if (ids.contains(id))
 					throw new IllegalArgumentException(String.format("Vertex with id %d already exists", id));
 				this.id = id;
@@ -542,7 +562,7 @@ public class Graph {
 			 * @return Identyfikator wierzchołka
 			 * @since 1.1
 			 */
-			public Integer getId() {
+			public @NotNull Integer getId() {
 				return id;
 			}
 
@@ -553,7 +573,7 @@ public class Graph {
 			 * @return Czy wierzchołek ma podany id
 			 * @since 1.0
 			 */
-			public boolean equals(Integer id) {
+			public boolean equals(@NotNull Integer id) {
 				return this.id.equals(id);
 			}
 
@@ -567,7 +587,7 @@ public class Graph {
 			 * @return Wierzchołek w formacie Mermaid
 			 * @since 1.0
 			 */
-			public String mermaid() {
+			public @NotNull String mermaid() {
 				return String.format("%d(\"%s\")", getId(), getName());
 			}
 		}
@@ -577,7 +597,7 @@ public class Graph {
 	 * Klasa wewnętrzna reprezentująca krawędzie grafu.
 	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 1.1
+	 * @version 1.2
 	 * @since 1.0
 	 */
 	protected class Edges {
@@ -611,9 +631,7 @@ public class Graph {
 		 * @since 1.1
 		 */
 		public Edges(@NotNull Edges edges) {
-			this.edges = new ArrayList<>();
-			for (Edge e: edges.edges)
-				create(e.v1, e.v2, e.weight);
+			this.edges = new ArrayList<>(edges.edges);
 		}
 
 		/**
@@ -626,7 +644,7 @@ public class Graph {
 		 * @throws NoSuchElementException   Wierzchołki o podanych id muszą istnieć
 		 * @since 1.0
 		 */
-		public void create(Integer id1, Integer id2, Double weight) {
+		public void create(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 			if (exists(id1, id2))
 				throw new IllegalArgumentException(String.format("Edge between %d and %d already exists", id1, id2));
 			if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
@@ -642,8 +660,11 @@ public class Graph {
 		 * @param weight Nowa waga krawędzi
 		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
+		 * @deprecated Od wersji 1.2 użyj {@link #setWeight(Integer, Integer, Double)}
 		 */
-		public void edit(Integer id1, Integer id2, Double weight) {
+		@SuppressWarnings("DeprecatedIsStillUsed")
+		@Deprecated
+		public void edit(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 			if (!exists(id1, id2))
 				throw new NoSuchElementException(String.format("Edge between %d and %d does not exist", id1, id2));
 			remove(id1, id2);
@@ -658,7 +679,7 @@ public class Graph {
 		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
 		 */
-		public void remove(Integer id1, Integer id2) {
+		public void remove(@NotNull Integer id1, @NotNull Integer id2) {
 			if (!exists(id1, id2))
 				throw new NoSuchElementException(String.format("Edge between %d and %d does not exist", id1, id2));
 			edges.removeIf(e -> e.connects(id1, id2));
@@ -668,12 +689,12 @@ public class Graph {
 		 * Usuwa wszystkie krawędzie z wierzchołka.
 		 *
 		 * @param id Identyfikator wierzchołka
-		 * @throws IllegalArgumentException Wierzchołek o podanym id musi istnieć
+		 * @throws NoSuchElementException Wierzchołek o podanym id musi istnieć
 		 * @since 1.0
 		 */
-		public void removeAll(Integer id) {
+		public void removeAll(@NotNull Integer id) {
 			if (!VERTICES.exists(id))
-				throw new IllegalArgumentException(String.format("Vertex %d must exist", id));
+				throw new NoSuchElementException(String.format("Vertex %d must exist", id));
 			edges.removeIf(e -> e.connects(id));
 		}
 
@@ -704,7 +725,7 @@ public class Graph {
 		 * @throws NoSuchElementException Wierzchołki o podanych id muszą istnieć
 		 * @since 1.0
 		 */
-		public boolean exists(Integer id1, Integer id2) {
+		public boolean exists(@NotNull Integer id1, @NotNull Integer id2) {
 			if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
 				throw new NoSuchElementException(String.format("Vertices %d and %d must exist", id1, id2));
 			return edges.stream().anyMatch(e -> e.connects(id1, id2));
@@ -718,7 +739,7 @@ public class Graph {
 		 * @throws NoSuchElementException Wierzchołek o podanym id musi istnieć
 		 * @since 1.0
 		 */
-		public boolean exists(Integer id) {
+		public boolean exists(@NotNull Integer id) {
 			if (!VERTICES.exists(id))
 				throw new NoSuchElementException(String.format("Vertex %d must exist", id));
 			return edges.stream().anyMatch(e -> e.connects(id));
@@ -733,15 +754,29 @@ public class Graph {
 		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
 		 * @since 1.0
 		 */
-		public Double getWeight(Integer id1, Integer id2) {
+		public @NotNull Double getWeight(@NotNull Integer id1, @NotNull Integer id2) {
 			return edges.stream().filter(e -> e.connects(id1, id2)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No edge found between %d and %d", id1, id2))).getWeight();
+		}
+
+		/**
+		 * Ustawia wagę krawędzi.
+		 *
+		 * @param id1    Identyfikator pierwszego wierzchołka
+		 * @param id2    Identyfikator drugiego wierzchołka
+		 * @param weight Nowa waga krawędzi
+		 * @throws NoSuchElementException Krawędź między podanymi wierzchołkami nie istnieje
+		 * @see Edge#setWeight(Double)
+		 * @since 1.2
+		 */
+		public void setWeight(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
+			edges.stream().filter(e -> e.connects(id1, id2)).findFirst().orElseThrow(() -> new NoSuchElementException(String.format("No edge found between %d and %d", id1, id2))).setWeight(weight);
 		}
 
 		/**
 		 * Klasa wewnętrzna reprezentująca krawędź grafu.
 		 *
 		 * @author Krzysztof Jurkowski
-		 * @version 1.1
+		 * @version 1.2
 		 * @since 1.0
 		 */
 		protected class Edge {
@@ -750,19 +785,19 @@ public class Graph {
 			 *
 			 * @since 1.0
 			 */
-			protected final Integer v1;
+			protected final @NotNull Integer v1;
 			/**
 			 * Identyfikator drugiego wierzchołka
 			 *
 			 * @since 1.0
 			 */
-			protected final Integer v2;
+			protected final @NotNull Integer v2;
 			/**
 			 * Waga krawędzi
 			 *
 			 * @since 1.0
 			 */
-			protected final Double weight;
+			protected @NotNull Double weight;
 
 			/**
 			 * Konstruktor klasy Edge
@@ -776,7 +811,7 @@ public class Graph {
 			 * @throws NoSuchElementException Wierzchołki o podanych id muszą istnieć
 			 * @since 1.0
 			 */
-			public Edge(Integer id1, Integer id2, Double weight) {
+			public Edge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
 				if (!VERTICES.exists(id1) || !VERTICES.exists(id2))
 					throw new NoSuchElementException(String.format("Vertices %d and %d must exist", id1, id2));
 				this.v1 = id1;
@@ -790,8 +825,18 @@ public class Graph {
 			 * @return Waga krawędzi
 			 * @since 1.0
 			 */
-			public Double getWeight() {
+			public @NotNull Double getWeight() {
 				return weight;
+			}
+
+			/**
+			 * Ustawia wagę krawędzi.
+			 *
+			 * @param weight Nowa waga krawędzi
+			 * @since 1.2
+			 */
+			public void setWeight(@NotNull Double weight) {
+				this.weight = weight;
 			}
 
 			/**
@@ -801,7 +846,7 @@ public class Graph {
 			 * @return Czy krawędź łączy wierzchołek
 			 * @since 1.0
 			 */
-			public boolean connects(Integer id) {
+			public boolean connects(@NotNull Integer id) {
 				return v1.equals(id) || v2.equals(id);
 			}
 
@@ -814,7 +859,7 @@ public class Graph {
 			 * @see Edge#connects(Integer)
 			 * @since 1.0
 			 */
-			public boolean connects(Integer id1, Integer id2) {
+			public boolean connects(@NotNull Integer id1, @NotNull Integer id2) {
 				return connects(id1) && connects(id2);
 			}
 
@@ -828,7 +873,7 @@ public class Graph {
 			 * @return Krawędź w formacie Mermaid
 			 * @since 1.0
 			 */
-			public String mermaid() {
+			public @NotNull String mermaid() {
 				return String.format("%d ---|%f| %d", v1, getWeight(), v2);
 			}
 		}

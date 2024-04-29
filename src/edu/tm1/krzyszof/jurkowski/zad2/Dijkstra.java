@@ -9,14 +9,21 @@ import java.util.*;
  * Klasa implementująca algorytm Dijkstry
  *
  * @author Krzysztof Jurkowski
- * @version 2.2
+ * @version 2.3
  * @see Graph
  * @since zad2
  */
 public class Dijkstra extends Graph {
 	/**
+	 * Wynik algorytmu Dijkstry
+	 *
+	 * @since 2.0
+	 */
+	private ResultVertices resultVertices;
+	/**
 	 * Identyfikator wierzchołka źródłowego
 	 *
+	 * @see #setSource(Integer) setter
 	 * @since 2.0
 	 */
 	private Integer src;
@@ -26,12 +33,6 @@ public class Dijkstra extends Graph {
 	 * @since 2.1
 	 */
 	private boolean calculated;
-	/**
-	 * Wynik algorytmu Dijkstry
-	 *
-	 * @since 2.0
-	 */
-	private ResultVertices RESULT;
 
 	/**
 	 * Konstruktor pusty
@@ -39,6 +40,7 @@ public class Dijkstra extends Graph {
 	 * Tworzy pusty graf bez wyniku.
 	 * </p>
 	 *
+	 * @see Graph#Graph()
 	 * @since 1.0
 	 */
 	public Dijkstra() {
@@ -54,12 +56,29 @@ public class Dijkstra extends Graph {
 	 * </p>
 	 *
 	 * @param graph Graf
+	 * @see Graph#Graph(Graph)
 	 * @since 1.1
 	 */
 	public Dijkstra(@NotNull Graph graph) {
 		super(graph);
 		src = null;
 		calculated = false;
+	}
+
+	/**
+	 * Konstruktor kopiujący
+	 *
+	 * @param dijkstra obiekt do skopiowania
+	 * @see Graph#Graph(Graph)
+	 * @since 2.4
+	 */
+	public Dijkstra(@NotNull Dijkstra dijkstra) {
+		super(dijkstra);
+		src = dijkstra.src;
+		if (dijkstra.calculated)
+			calculateDijkstra();
+		else
+			calculated = false;
 	}
 
 	/**
@@ -70,14 +89,15 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param graph Graf
 	 * @param src   Identyfikator wierzchołka źródłowego
+	 * @see Graph#Graph(Graph)  Graph
 	 * @see #setSource(Integer)
-	 * @see #calculate()
+	 * @see #calculateDijkstra()
 	 * @since 2.0
 	 */
 	public Dijkstra(@NotNull Graph graph, @NotNull Integer src) {
 		super(graph);
 		setSource(src);
-		calculate();
+		calculateDijkstra();
 	}
 
 	/**
@@ -86,33 +106,33 @@ public class Dijkstra extends Graph {
 	 * @throws IllegalStateException Wierzchołek źródłowy nie jest ustawiony
 	 * @since 2.0
 	 */
-	public void calculate() {
+	public void calculateDijkstra() {
 		if (calculated)
 			return;
 		if (src == null) {
 			throw new IllegalStateException("Source vertex not set");
 		}
 
-		RESULT = new ResultVertices(VERTICES, src);
+		resultVertices = new ResultVertices(vertices, src);
 
-		Set<Integer> Q = new HashSet<>(VERTICES.getIds());
+		Set<Integer> Q = new HashSet<>(vertices.getIds());
 
 		while (!Q.isEmpty()) {
 			Integer u = null;
 			for (Integer id: Q) {
-				if (u == null || RESULT.getCost(id) < RESULT.getCost(u)) {
+				if (u == null || resultVertices.getCost(id) < resultVertices.getCost(u)) {
 					u = id;
 				}
 			}
 			Q.remove(u);
 
 			for (Integer v: Q) {
-				if (!EDGES.exists(u, v))
+				if (!edges.exists(u, v))
 					continue;
-				Double alt = RESULT.getCost(u) + EDGES.getWeight(u, v);
-				if (alt < RESULT.getCost(v)) {
-					RESULT.setCost(v, alt);
-					RESULT.setPrevious(v, u);
+				Double alt = resultVertices.getCost(u) + edges.getWeight(u, v);
+				if (alt < resultVertices.getCost(v)) {
+					resultVertices.setCost(v, alt);
+					resultVertices.setPrevious(v, u);
 				}
 			}
 		}
@@ -128,26 +148,50 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param source Identyfikator wierzchołka źródłowego
 	 * @see #setSource(Integer)
-	 * @see #calculate()
+	 * @see #calculateDijkstra()
 	 * @since 2.2
 	 */
-	public void calculate(@NotNull Integer source) {
+	public void calculateDijkstra(@NotNull Integer source) {
 		setSource(source);
-		calculate();
+		calculateDijkstra();
 	}
 
 	/**
 	 * Konwertuje wynik algorytmu Dijkstry na graf w formacie Mermaid
 	 *
 	 * @return Graf z wynikiem algorytmu Dijkstry
-	 * @see #calculate()
+	 * @see #calculateDijkstra()
 	 * @see ResultVertices#mermaid()
 	 * @since 2.0
 	 */
-	public @NotNull String mermaidResult() {
+	@Override
+	public @NotNull String mermaid() {
 		if (!calculated)
-			calculate();
-		return String.format("graph\n%s", RESULT.mermaid());
+			calculateDijkstra();
+		return String.format("graph\n%s", resultVertices.mermaid());
+	}
+
+	/**
+	 * Konwertuje graf na Mermaid
+	 * <p>
+	 * Wykonuje konwersję grafu na format Mermaid.
+	 * Możliwe jest wybranie trybu konwersji.
+	 * </p>
+	 *
+	 * @param mermaid Tryb konwersji
+	 * @return Graf w formacie Mermaid
+	 * @see MERMAID tryby konwersji
+	 * @see #mermaid()
+	 * @see Graph#mermaid(Graph.MERMAID)
+	 * @since 1.3
+	 */
+	public @NotNull String mermaid(@NotNull MERMAID mermaid) {
+		return switch (mermaid) {
+			case DIJKSTRA ->
+					mermaid();
+			default ->
+					super.mermaid(mermaid.toGraphMermaid());
+		};
 	}
 
 	/**
@@ -161,7 +205,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public @NotNull Integer addVertex(String name) {
 		calculated = false;
-		return VERTICES.create(name);
+		return vertices.create(name);
 	}
 
 	/**
@@ -174,7 +218,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public @NotNull Integer addVertex() {
 		calculated = false;
-		return VERTICES.create();
+		return vertices.create();
 	}
 
 	/**
@@ -188,7 +232,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public Integer @NotNull [] addVertex(String @NotNull ... names) {
 		calculated = false;
-		return VERTICES.create(names);
+		return vertices.create(names);
 	}
 
 	/**
@@ -202,7 +246,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public Integer @NotNull [] addVertex(int n) {
 		calculated = false;
-		return VERTICES.create(n);
+		return vertices.create(n);
 	}
 
 	/**
@@ -215,7 +259,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void removeVertex(@NotNull Integer id) {
 		calculated = false;
-		VERTICES.remove(id);
+		vertices.remove(id);
 	}
 
 	/**
@@ -226,9 +270,9 @@ public class Dijkstra extends Graph {
 	 * @since 1.0
 	 */
 	@Override
-	public void removeVertex(Integer @NotNull ... ids) {
+	public void removeVertex(@NotNull Integer @NotNull ... ids) {
 		calculated = false;
-		VERTICES.remove(ids);
+		vertices.remove(ids);
 	}
 
 	/**
@@ -242,7 +286,7 @@ public class Dijkstra extends Graph {
 	@Override
 	public void setVertexName(@NotNull Integer id, String name) {
 		calculated = false;
-		VERTICES.setName(id, name);
+		vertices.setName(id, name);
 	}
 
 	/**
@@ -250,14 +294,14 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Koszt dotarcia do wierzchołka
-	 * @see #calculate()
+	 * @see #calculateDijkstra()
 	 * @see ResultVertices#getCost(Integer)
 	 * @since 2.0
 	 */
 	public @NotNull Double getVertexCost(@NotNull Integer id) {
 		if (!calculated)
-			calculate();
-		return RESULT.getCost(id);
+			calculateDijkstra();
+		return resultVertices.getCost(id);
 	}
 
 	/**
@@ -265,36 +309,36 @@ public class Dijkstra extends Graph {
 	 *
 	 * @param id Identyfikator wierzchołka
 	 * @return Identyfikator poprzedniego wierzchołka
-	 * @see #calculate()
+	 * @see #calculateDijkstra()
 	 * @see ResultVertices#getPrevious(Integer)
 	 * @since 2.0
 	 */
 	public Integer getVertexPrevious(@NotNull Integer id) {
 		if (!calculated)
-			calculate();
-		return RESULT.getPrevious(id);
+			calculateDijkstra();
+		return resultVertices.getPrevious(id);
 	}
 
 	/**
 	 * Dodaje krawędź do grafu
 	 *
-	 * @param id1    Identyfikator wierzchołka 1
-	 * @param id2    Identyfikator wierzchołka 2
+	 * @param v1     Identyfikator wierzchołka 1
+	 * @param v2     Identyfikator wierzchołka 2
 	 * @param weight Waga krawędzi
 	 * @see Edges#create(Integer, Integer, Double)
 	 * @since 1.0
 	 */
 	@Override
-	public void addEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
-		EDGES.create(id1, id2, weight);
+	public void addEdge(@NotNull Integer v1, @NotNull Integer v2, @NotNull Double weight) {
+		edges.create(v1, v2, weight);
 		calculated = false;
 	}
 
 	/**
 	 * Zmienia wagę krawędzi.
 	 *
-	 * @param id1    Identyfikator pierwszego wierzchołka
-	 * @param id2    Identyfikator drugiego wierzchołka
+	 * @param v1     Identyfikator pierwszego wierzchołka
+	 * @param v2     Identyfikator drugiego wierzchołka
 	 * @param weight Nowa waga krawędzi
 	 * @see Edges#edit(Integer, Integer, Double)
 	 * @since 1.0
@@ -303,22 +347,22 @@ public class Dijkstra extends Graph {
 	@SuppressWarnings("deprecation")
 	@Override
 	@Deprecated
-	public void editEdge(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
-		EDGES.edit(id1, id2, weight);
+	public void editEdge(@NotNull Integer v1, @NotNull Integer v2, @NotNull Double weight) {
+		edges.edit(v1, v2, weight);
 		calculated = false;
 	}
 
 	/**
 	 * Usuwa krawędź z grafu.
 	 *
-	 * @param id1 Identyfikator pierwszego wierzchołka
-	 * @param id2 Identyfikator drugiego wierzchołka
+	 * @param v1 Identyfikator pierwszego wierzchołka
+	 * @param v2 Identyfikator drugiego wierzchołka
 	 * @see Edges#remove(Integer, Integer)
 	 * @since 1.0
 	 */
 	@Override
-	public void removeEdge(@NotNull Integer id1, @NotNull Integer id2) {
-		EDGES.remove(id1, id2);
+	public void removeEdge(@NotNull Integer v1, @NotNull Integer v2) {
+		edges.remove(v1, v2);
 		calculated = false;
 	}
 
@@ -331,7 +375,20 @@ public class Dijkstra extends Graph {
 	 */
 	@Override
 	public void removeAllEdges(@NotNull Integer id) {
-		EDGES.removeAll(id);
+		edges.removeAll(id);
+		calculated = false;
+	}
+
+	/**
+	 * Usuwa wszystkie krawędzie z podanych wierzchołków
+	 *
+	 * @param ids Identyfikatory wierzchołków
+	 * @see Edges#removeAll(Integer...)
+	 * @since 2.4
+	 */
+	@Override
+	public void removeAllEdges(@NotNull Integer @NotNull ... ids) {
+		edges.removeAll(ids);
 		calculated = false;
 	}
 
@@ -343,7 +400,7 @@ public class Dijkstra extends Graph {
 	 * @since 2.2
 	 */
 	public void setSource(@NotNull Integer source) {
-		if (VERTICES.exists(source))
+		if (vertices.exists(source))
 			throw new NoSuchElementException(String.format("Vertex with id %d does not exist", source));
 		src = source;
 		calculated = false;
@@ -352,16 +409,46 @@ public class Dijkstra extends Graph {
 	/**
 	 * Ustawia wagę krawędzi
 	 *
-	 * @param id1    Identyfikator pierwszego wierzchołka
-	 * @param id2    Identyfikator drugiego wierzchołka
+	 * @param v1     Identyfikator pierwszego wierzchołka
+	 * @param v2     Identyfikator drugiego wierzchołka
 	 * @param weight Nowa waga krawędzi
 	 * @see Edges#setWeight(Integer, Integer, Double)
 	 * @since 2.2
 	 */
 	@Override
-	public void setEdgeWeight(@NotNull Integer id1, @NotNull Integer id2, @NotNull Double weight) {
-		EDGES.setWeight(id1, id2, weight);
+	public void setEdgeWeight(@NotNull Integer v1, @NotNull Integer v2, @NotNull Double weight) {
+		edges.setWeight(v1, v2, weight);
 		calculated = false;
+	}
+
+	/**
+	 * Tryby dla funkcji {@link #mermaid(MERMAID)}
+	 *
+	 * @author Krzysztof Jurkowski
+	 * @version 2.1
+	 * @since 2.3
+	 */
+	public enum MERMAID {
+		VERTICES, EDGES, GRAPH, DIJKSTRA;
+
+		/**
+		 * Konwerter do MERMAID kompatybilny z metodami w {@link Graph}
+		 *
+		 * @return MERMAID kompatybilny z {@link Graph.MERMAID}
+		 * @since 2.1
+		 */
+		public Graph.MERMAID toGraphMermaid() {
+			return switch (this) {
+				case VERTICES ->
+						Graph.MERMAID.VERTICES;
+				case EDGES ->
+						Graph.MERMAID.EDGES;
+				case GRAPH ->
+						Graph.MERMAID.GRAPH;
+				default ->
+						throw new IllegalArgumentException("Unexpected value: " + this);
+			};
+		}
 	}
 
 	/**
@@ -371,7 +458,7 @@ public class Dijkstra extends Graph {
 	 * </p>
 	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 2.1
+	 * @version 2.2
 	 * @since 2.0
 	 */
 	private class ResultVertices extends Vertices {
@@ -402,6 +489,7 @@ public class Dijkstra extends Graph {
 		 * </p>
 		 *
 		 * @param vertices Lista wierzchołków
+		 * @see #create()
 		 * @since 2.0
 		 */
 		public ResultVertices(@NotNull Vertices vertices, @NotNull Integer src) {
@@ -608,7 +696,7 @@ public class Dijkstra extends Graph {
 			if (!ids.contains(id)) {
 				throw new NoSuchElementException(String.format("Vertex with id %d does not exist", id));
 			}
-			if (EDGES.exists(id)) {
+			if (edges.exists(id)) {
 				throw new IllegalStateException(String.format("Vertex with id %d has edges", id));
 			}
 			ids.removeIf(i -> i.equals(id));
@@ -643,11 +731,11 @@ public class Dijkstra extends Graph {
 		@Override
 		public @NotNull String mermaid() {
 			StringBuilder sb = new StringBuilder();
-			Edges edges = new Edges(EDGES);
+			Edges edges = new Edges(Dijkstra.this.edges);
 			for (ResultVertex v: vertices) {
 				sb.append("\t").append(v.mermaid()).append("\n");
 				if (v.getPrevious() != null) {
-					sb.append("\t").append(String.format("%d ===|%f| %d", v.getId(), EDGES.getWeight(v.getId(), v.getPrevious()), v.getPrevious())).append("\n");
+					sb.append("\t").append(String.format("%d ===|%f| %d", v.getId(), Dijkstra.this.edges.getWeight(v.getId(), v.getPrevious()), v.getPrevious())).append("\n");
 					edges.remove(v.getId(), v.getPrevious());
 				}
 			}

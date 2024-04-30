@@ -8,5 +8,5 @@ Polecam skorzystać z [Mermaid Live Editor](https://mermaid.live/) do pracy z fo
 
 Planowane funkcje:
 
-- [ ] Zapis i odczyt grafu z pliku
+- [x] Zapis i odczyt grafu z pliku
 - [ ] Wizualizacja grafu

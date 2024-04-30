@@ -2,9 +2,17 @@ package edu.tm1.krzyszof.jurkowski.zad1;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Graf nieskierowany z wagami
@@ -14,7 +22,7 @@ import java.util.NoSuchElementException;
  * </p>
  *
  * @author Krzysztof Jurkowski
- * @version 1.3
+ * @version 1.4
  * @since zad1
  */
 public class Graph {
@@ -320,6 +328,167 @@ public class Graph {
 	}
 
 	/**
+	 * Zapis grafu do pliku
+	 *
+	 * @param name nazwa pliku
+	 * @throws IOException błąd zapisu
+	 * @see #mermaid(MERMAID)
+	 * @since 1.4
+	 */
+	public void save(@NotNull String name) throws IOException {
+		Path file = Path.of(name + ".graph.mmd");
+		try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_16)) {
+			String s = String.format("""
+					---
+					title: %s
+					zad: 1
+					---
+					%s
+					""", name, mermaid(MERMAID.GRAPH));
+			writer.write(s);
+		}
+	}
+
+	/**
+	 * Wczytuje graf z pliku
+	 *
+	 * @param name nazwa pliku
+	 * @throws IOException błąd odczytu
+	 * @see #save(String)
+	 * @since 1.4
+	 */
+	public void load(@NotNull String name) throws IOException {
+		Path file = Path.of(name + ".graph.mmd");
+		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
+			String line;
+
+			enum Stage {
+				start, yaml, graph, vertices, edges
+			}
+
+			class Match {
+				final Pattern yaml = Pattern.compile("(?<key>\\w): (?<value>.+)");
+				final Pattern vertex = Pattern.compile("(?<id>\\d+)\\(\"(?<name>.*)\"\\)");
+				final Pattern edge = Pattern.compile("(?<v1>\\d+) ---\\|(?<weight>\\d+\\.?\\d*)\\| (?<v2>\\d+)");
+
+				void yaml(String line) {
+					Matcher m = yaml.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					System.out.printf("\t%s: %s\n", m.group("key"), m.group("value"));
+					switch (m.group("key")) {
+						case "title" -> {
+							if (!m.group("value").equals(name)) {
+								System.err.println("[WARN]Title does not match filename");
+							}
+						}
+						case "zad" -> {
+							int v = Integer.parseInt(m.group("value"));
+							if (v < 1)
+								System.err.println("[ERR]Format outdated");
+							else if (v > 1)
+								System.err.println("[WARN]Newer format detected");
+						}
+						default ->
+								System.out.printf("[INFO]Unknown property: %s\n", m.group("key"));
+					}
+				}
+
+				void vertex(String line) {
+					Matcher m = this.vertex.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					Integer id = Integer.parseInt(m.group("id"));
+					System.out.printf("\tVertex: %d(%s)\n", id, m.group("name"));
+					vertices.vertices.add(vertices.new Vertex(id, m.group("name")));
+				}
+
+				void edge(String line) {
+					Matcher m = edge.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					Integer v1 = Integer.parseInt(m.group("v1"));
+					Integer v2 = Integer.parseInt(m.group("v2"));
+					Double weight = Double.parseDouble(m.group("weight"));
+					System.out.printf("\tEdge: %d ---|%f| %d\n", v1, weight, v2);
+					edges.create(v1, v2, weight);
+				}
+			}
+
+			Stage stage = Stage.start;
+
+			Match match = new Match();
+
+			System.out.println("Reading graph...\n");
+			while ((line = reader.readLine()) != null) {
+				switch (stage) {
+					case start -> {
+						if (line.startsWith("%% "))
+							break;
+						if (line.equals("---")) {
+							stage = Stage.yaml;
+							System.out.println("Reading properties...");
+							break;
+						}
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+					}
+					case yaml -> {
+						if (line.startsWith("#"))
+							break;
+						if (line.equals("---")) {
+							stage = Stage.graph;
+							System.out.println("Properties read!\n");
+							break;
+						}
+						match.yaml(line);
+					}
+					case graph -> {
+						if (line.startsWith("%% "))
+							break;
+						if (line.startsWith("graph")) {
+							stage = Stage.vertices;
+							System.out.println("Reading structure...\n\nReading vertices...");
+							break;
+						}
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+					}
+					case vertices -> {
+						if (line.startsWith("%% "))
+							break;
+
+						if (line.matches(match.edge.pattern())) {
+							stage = Stage.edges;
+							System.out.println("Vertices read!\n\nReading edges...");
+							continue;
+						}
+
+						match.vertex(line);
+					}
+					case edges -> {
+						if (line.startsWith("%% "))
+							break;
+
+						if (line.matches(match.vertex.pattern())) {
+							System.err.println("[WARN]Vertex found in edges section");
+							match.vertex(line);
+							break;
+						}
+
+						match.edge(line);
+					}
+				}
+			}
+			System.out.println("Edges read!\n\nStructure read!\n\nGraph read!");
+		}
+	}
+
+	/**
 	 * Tryby dla funkcji {@link #mermaid(MERMAID)}
 	 *
 	 * @author Krzysztof Jurkowski
@@ -334,7 +503,7 @@ public class Graph {
 	 * Klasa wewnętrzna reprezentująca wierzchołki grafu.
 	 *
 	 * @author Krzysztof Jurkowski
-	 * @version 1.3
+	 * @version 1.4
 	 * @since 1.0
 	 */
 	protected class Vertices {
@@ -344,7 +513,7 @@ public class Graph {
 		 * @see #getVertices() getter
 		 * @since 1.0
 		 */
-		private final List<Vertex> vertices;
+		public final List<Vertex> vertices;
 		/**
 		 * Zajęte identyfikatory wierzchołków.
 		 *

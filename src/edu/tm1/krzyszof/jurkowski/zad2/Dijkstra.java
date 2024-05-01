@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * Klasa implementująca algorytm Dijkstry
  *
  * @author Krzysztof Jurkowski
- * @version 2.4
+ * @version 2.5
  * @see Graph
  * @since zad2
  */
@@ -106,6 +106,155 @@ public class Dijkstra extends Graph {
 		super(graph);
 		setSource(src);
 		calculateDijkstra();
+	}
+
+	/**
+	 * Wczytuje graf z pliku
+	 *
+	 * @param file ścieżka pliku
+	 * @return wczytany graf
+	 * @throws IOException błąd odczytu
+	 * @see #save(String)
+	 * @since 2.4
+	 */
+	public static @NotNull Dijkstra load(@NotNull Path file) throws IOException {
+		Dijkstra dijkstra = new Dijkstra();
+		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
+			String line;
+
+			enum Stage {
+				start, yaml, graph, vertices, edges
+			}
+
+			class Match {
+				final Pattern yaml = Pattern.compile("(?<key>\\w): (?<value>.+)");
+				final Pattern vertex = Pattern.compile("(?<id>\\d+)\\(\"(?<name>.*)\"\\)");
+				final Pattern edge = Pattern.compile("(?<v1>\\d+) ---\\|(?<weight>\\d+\\.?\\d*)\\| (?<v2>\\d+)");
+
+				void yaml(String line) {
+					Matcher m = yaml.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					System.out.printf("\t%s: %s\n", m.group("key"), m.group("value"));
+					switch (m.group("key")) {
+						case "title" -> {
+							if (!(m.group("value") + ".graph.mmd").equals(file.getFileName().toString())) {
+								System.err.println("[WARN]Title does not match filename");
+							}
+						}
+						case "zad" -> {
+							int v = Integer.parseInt(m.group("value"));
+							if (v < 2)
+								System.out.println("[WARN]Format outdated");
+							else if (v > 2)
+								System.err.println("[WARN]Newer format detected");
+						}
+						case "src" -> {
+							Integer id = Integer.parseInt(m.group("value"));
+							System.out.printf("\tSource: %d\n", id);
+							if (!id.equals(0))
+								dijkstra.src = id;
+						}
+						default ->
+								System.out.printf("[INFO]Unknown property: %s\n", m.group("key"));
+					}
+				}
+
+				void vertex(String line) {
+					Matcher m = this.vertex.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					Integer id = Integer.parseInt(m.group("id"));
+					System.out.printf("\tVertex: %d(%s)\n", id, m.group("name"));
+					dijkstra.vertices.vertices.add(dijkstra.vertices.new Vertex(id, m.group("name")));
+				}
+
+				void edge(String line) {
+					Matcher m = edge.matcher(line);
+					if (!m.matches()) {
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+						return;
+					}
+					Integer v1 = Integer.parseInt(m.group("v1"));
+					Integer v2 = Integer.parseInt(m.group("v2"));
+					Double weight = Double.parseDouble(m.group("weight"));
+					System.out.printf("\tEdge: %d ---|%f| %d\n", v1, weight, v2);
+					dijkstra.edges.create(v1, v2, weight);
+				}
+			}
+
+			Stage stage = Stage.start;
+
+			Match match = new Match();
+
+			System.out.println("Reading graph...\n");
+			while ((line = reader.readLine()) != null) {
+				switch (stage) {
+					case start -> {
+						if (line.startsWith("%% "))
+							break;
+						if (line.equals("---")) {
+							stage = Stage.yaml;
+							System.out.println("Reading properties...");
+							break;
+						}
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+					}
+					case yaml -> {
+						if (line.startsWith("#"))
+							break;
+						if (line.equals("---")) {
+							stage = Stage.graph;
+							System.out.println("Properties read!\n");
+							break;
+						}
+						match.yaml(line);
+					}
+					case graph -> {
+						if (line.startsWith("%% "))
+							break;
+						if (line.startsWith("graph")) {
+							stage = Stage.vertices;
+							System.out.println("Reading structure...\n\nReading vertices...");
+							break;
+						}
+						System.err.printf("[ERR]Unknown line: %s\n", line);
+					}
+					case vertices -> {
+						if (line.startsWith("%% "))
+							break;
+
+						if (line.matches(match.edge.pattern())) {
+							stage = Stage.edges;
+							System.out.println("Vertices read!\n\nReading edges...");
+							continue;
+						}
+
+						match.vertex(line);
+					}
+					case edges -> {
+						if (line.startsWith("%% "))
+							break;
+
+						if (line.matches(match.vertex.pattern())) {
+							System.err.println("[WARN]Vertex found in edges section");
+							match.vertex(line);
+							break;
+						}
+
+						match.edge(line);
+					}
+				}
+			}
+			System.out.println("Edges read!\n\nStructure read!\n\nGraph read!");
+			if (dijkstra.src != null)
+				dijkstra.calculateDijkstra();
+		}
+		return dijkstra;
 	}
 
 	/**
@@ -454,154 +603,6 @@ public class Dijkstra extends Graph {
 			writer.write(s);
 			if (src == 0)
 				src = null;
-		}
-	}
-
-	/**
-	 * Wczytuje graf z pliku
-	 *
-	 * @param name nazwa pliku
-	 * @throws IOException błąd odczytu
-	 * @see #save(String)
-	 * @since 2.4
-	 */
-	@Override
-	public void load(@NotNull String name) throws IOException {
-		Path file = Path.of(name + ".graph.mmd");
-		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
-			String line;
-
-			enum Stage {
-				start, yaml, graph, vertices, edges
-			}
-
-			class Match {
-				final Pattern yaml = Pattern.compile("(?<key>\\w): (?<value>.+)");
-				final Pattern vertex = Pattern.compile("(?<id>\\d+)\\(\"(?<name>.*)\"\\)");
-				final Pattern edge = Pattern.compile("(?<v1>\\d+) ---\\|(?<weight>\\d+\\.?\\d*)\\| (?<v2>\\d+)");
-
-				void yaml(String line) {
-					Matcher m = yaml.matcher(line);
-					if (!m.matches()) {
-						System.err.printf("[ERR]Unknown line: %s\n", line);
-						return;
-					}
-					System.out.printf("\t%s: %s\n", m.group("key"), m.group("value"));
-					switch (m.group("key")) {
-						case "title" -> {
-							if (!m.group("value").equals(name)) {
-								System.err.println("[WARN]Title does not match filename");
-							}
-						}
-						case "zad" -> {
-							int v = Integer.parseInt(m.group("value"));
-							if (v < 2)
-								System.out.println("[WARN]Format outdated");
-							else if (v > 2)
-								System.err.println("[WARN]Newer format detected");
-						}
-						case "src" -> {
-							Integer id = Integer.parseInt(m.group("value"));
-							System.out.printf("\tSource: %d\n", id);
-							if (!id.equals(0))
-								src = id;
-						}
-						default ->
-								System.out.printf("[INFO]Unknown property: %s\n", m.group("key"));
-					}
-				}
-
-				void vertex(String line) {
-					Matcher m = this.vertex.matcher(line);
-					if (!m.matches()) {
-						System.err.printf("[ERR]Unknown line: %s\n", line);
-						return;
-					}
-					Integer id = Integer.parseInt(m.group("id"));
-					System.out.printf("\tVertex: %d(%s)\n", id, m.group("name"));
-					vertices.vertices.add(vertices.new Vertex(id, m.group("name")));
-				}
-
-				void edge(String line) {
-					Matcher m = edge.matcher(line);
-					if (!m.matches()) {
-						System.err.printf("[ERR]Unknown line: %s\n", line);
-						return;
-					}
-					Integer v1 = Integer.parseInt(m.group("v1"));
-					Integer v2 = Integer.parseInt(m.group("v2"));
-					Double weight = Double.parseDouble(m.group("weight"));
-					System.out.printf("\tEdge: %d ---|%f| %d\n", v1, weight, v2);
-					edges.create(v1, v2, weight);
-				}
-			}
-
-			Stage stage = Stage.start;
-
-			Match match = new Match();
-
-			System.out.println("Reading graph...\n");
-			while ((line = reader.readLine()) != null) {
-				switch (stage) {
-					case start -> {
-						if (line.startsWith("%% "))
-							break;
-						if (line.equals("---")) {
-							stage = Stage.yaml;
-							System.out.println("Reading properties...");
-							break;
-						}
-						System.err.printf("[ERR]Unknown line: %s\n", line);
-					}
-					case yaml -> {
-						if (line.startsWith("#"))
-							break;
-						if (line.equals("---")) {
-							stage = Stage.graph;
-							System.out.println("Properties read!\n");
-							break;
-						}
-						match.yaml(line);
-					}
-					case graph -> {
-						if (line.startsWith("%% "))
-							break;
-						if (line.startsWith("graph")) {
-							stage = Stage.vertices;
-							System.out.println("Reading structure...\n\nReading vertices...");
-							break;
-						}
-						System.err.printf("[ERR]Unknown line: %s\n", line);
-					}
-					case vertices -> {
-						if (line.startsWith("%% "))
-							break;
-
-						if (line.matches(match.edge.pattern())) {
-							stage = Stage.edges;
-							System.out.println("Vertices read!\n\nReading edges...");
-							continue;
-						}
-
-						match.vertex(line);
-					}
-					case edges -> {
-						if (line.startsWith("%% "))
-							break;
-
-						if (line.matches(match.vertex.pattern())) {
-							System.err.println("[WARN]Vertex found in edges section");
-							match.vertex(line);
-							break;
-						}
-
-						match.edge(line);
-					}
-				}
-			}
-			System.out.println("Edges read!\n\nStructure read!\n\nGraph read!");
-			if (src != null)
-				calculateDijkstra();
 		}
 	}
 

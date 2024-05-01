@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
  * @see Dijkstra
  * @since zad3
  */
+@SuppressWarnings("unused")
 public class MinimalSpanningTree extends Dijkstra {
 	/**
 	 * Obiekt do obliczania minimalnego drzewa rozpinającego algorytmem Kruskala
@@ -93,6 +94,7 @@ public class MinimalSpanningTree extends Dijkstra {
 	 * @see Dijkstra#Dijkstra(Dijkstra)
 	 * @since 3.0
 	 */
+	@SuppressWarnings("CopyConstructorMissesField")
 	public MinimalSpanningTree(@NotNull MinimalSpanningTree MST) {
 		super(MST);
 		calculated = METHOD.NOT_CALCULATED;
@@ -167,6 +169,7 @@ public class MinimalSpanningTree extends Dijkstra {
 	 * @see #save(String)
 	 * @since 3.1
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	public static @NotNull MinimalSpanningTree load(@NotNull Path file) throws IOException {
 		MinimalSpanningTree mst = new MinimalSpanningTree();
 		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
@@ -396,12 +399,7 @@ public class MinimalSpanningTree extends Dijkstra {
 	 * @since 1.3
 	 */
 	public @NotNull String mermaid(@NotNull MERMAID mermaid) {
-		return switch (mermaid) {
-			case MST ->
-					mermaid();
-			default ->
-					super.mermaid(mermaid.toDijkstraMermaid());
-		};
+		return mermaid == MERMAID.MST ? mermaid() : super.mermaid(mermaid.toDijkstraMermaid());
 	}
 
 	/**
@@ -417,12 +415,7 @@ public class MinimalSpanningTree extends Dijkstra {
 	 * @since 3.0
 	 */
 	public @NotNull String mermaid(@NotNull MERMAID mermaid, @NotNull METHOD method) {
-		return switch (mermaid) {
-			case MST ->
-					mermaid(method);
-			default ->
-					super.mermaid(mermaid.toDijkstraMermaid());
-		};
+		return mermaid == MERMAID.MST ? mermaid(method) : super.mermaid(mermaid.toDijkstraMermaid());
 	}
 
 	/**

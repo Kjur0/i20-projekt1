@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
  * @see Graph
  * @since zad2
  */
+@SuppressWarnings("unused")
 public class Dijkstra extends Graph {
 	/**
 	 * Identyfikator wierzchołka źródłowego
@@ -117,6 +118,7 @@ public class Dijkstra extends Graph {
 	 * @see #save(String)
 	 * @since 2.4
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	public static @NotNull Dijkstra load(@NotNull Path file) throws IOException {
 		Dijkstra dijkstra = new Dijkstra();
 		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
@@ -343,12 +345,7 @@ public class Dijkstra extends Graph {
 	 * @since 1.3
 	 */
 	public @NotNull String mermaid(@NotNull MERMAID mermaid) {
-		return switch (mermaid) {
-			case DIJKSTRA ->
-					mermaid();
-			default ->
-					super.mermaid(mermaid.toGraphMermaid());
-		};
+		return mermaid == MERMAID.DIJKSTRA ? mermaid() : super.mermaid(mermaid.toGraphMermaid());
 	}
 
 	/**

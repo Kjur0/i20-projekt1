@@ -25,19 +25,20 @@ import java.util.regex.Pattern;
  * @version 1.5
  * @since zad1
  */
+@SuppressWarnings("unused")
 public class Graph {
 	/**
 	 * Wierzchołki grafu
 	 *
 	 * @since 1.0
 	 */
-	protected Vertices vertices;
+	protected final Vertices vertices;
 	/**
 	 * Krawędzie grafu
 	 *
 	 * @since 1.0
 	 */
-	protected Edges edges;
+	protected final Edges edges;
 
 	/**
 	 * Konstruktor klasy Graph
@@ -77,6 +78,7 @@ public class Graph {
 	 * @see #save(String)
 	 * @since 1.4
 	 */
+	@SuppressWarnings("DuplicatedCode")
 	public static @NotNull Graph load(@NotNull Path file) throws IOException {
 		Graph graph = new Graph();
 		try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_16)) {
